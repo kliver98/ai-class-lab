@@ -1,7 +1,9 @@
+import random as r
 import re
 
 _PLAYER = "player"
 _MACHINE = "machine"
+_TIE = "It's a TIE!"
 
 _PLAYER_SYMBOL = "x"
 _MACHINE_SYMBOL = "o"
@@ -14,6 +16,15 @@ class TicTacToeGame():
     self.winner = None
 
   def is_over(self): # TODO: Finish this function by adding checks for a winning game (rows, columns, diagonals)
+    if (self.board[0]!=None and self.board[0]==self.board[1]==self.board[2]) or (self.board[3]!=None and self.board[3]==self.board[4]==self.board[5]) or (self.board[6]!=None and self.board[6]==self.board[7]==self.board[8]):
+      self.winner = _PLAYER if self.turn==_MACHINE else _MACHINE
+      return True
+    if (self.board[0]!=None and self.board[0]==self.board[4]==self.board[8]) or (self.board[2]!=None and self.board[2]==self.board[4]==self.board[6]):
+      self.winner = _PLAYER if self.turn==_MACHINE else _MACHINE
+      return True
+    if (self.board[0]!=None and self.board[0]==self.board[3]==self.board[6]) or (self.board[1]!=None and self.board[1]==self.board[4]==self.board[7]) or (self.board[2]!=None and self.board[2]==self.board[5]==self.board[8]):
+      self.winner = _PLAYER if self.turn==_MACHINE else _MACHINE
+      return True
     return self.board.count(None) == 0
 
   def play(self):
@@ -23,6 +34,9 @@ class TicTacToeGame():
     else:
       self.machine_turn()
       self.turn = _PLAYER
+    if self.is_over():
+      self.is_game_over = True
+      self.print_result()
 
   def player_choose_cell(self):
     print("Input empty cell bewtween 0 and 8")
@@ -49,28 +63,26 @@ class TicTacToeGame():
 
     self.board[chosen_cell] = _PLAYER_SYMBOL
 
-  def machine_turn(self):
-    # TODO: Implement this function to make the machine choose a random cell (use random module)
-    # The result of this function should be that self.board now has one more random cell occupied
-
-    for i, cell in enumerate(self.board):
-      if cell is None:
-        self.board[i] = _MACHINE_SYMBOL
-        break
+  def machine_turn(self): # TODO: Finish this function by making the machine choose a random cell (use random module)
+    while True:
+      i = r.randint(0,8)
+      if self.board[i]:
+        continue
+      self.board[i] = _MACHINE_SYMBOL
+      break;
 
   def format_board(self):
-    # TODO: Implement this function, it must be able to print the board in the following format:
-    #  x|o| 
-    #   | | 
-    #   | | 
-    return self.board
+    row0 = "|".join(list(map(lambda c: " " if c is None else c, self.board[0:3])))
+    row1 = "|".join(list(map(lambda c: " " if c is None else c, self.board[3:6])))
+    row2 = "|".join(list(map(lambda c: " " if c is None else c, self.board[6:9])))
+
+    return "\n".join([row0, row1, row2])
 
   def print(self):
     print("Player turn:" if self.turn == _MACHINE else "Machine turn:")
     print(self.format_board())
     print()
 
-  def print_result(self):
-    # TODO: Implement this function in order to print the result based on the self.winner
-
-    pass
+  def print_result(self): # TODO: Finish this function in order to print the result based on the *winner*
+    msg = "winner is: "+self.winner if self.winner!=None else _TIE
+    print(msg)
